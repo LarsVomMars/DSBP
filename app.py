@@ -6,18 +6,16 @@ from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 load_dotenv()
 
-"""
-link id = open-link<F3>
-"""
+BASE_URL = "https://iphone.dsbcontrol.de/iPhoneService.svc/DSB"
+TOKEN_URL = f"{BASE_URL}/authid/{os.getenv('DSB_USER')}/{os.getenv('DSB_PWD')}"
+TOKEN = requests.get(TOKEN_URL).json()
+URL = requests.get(f"{BASE_URL}/timetables/{TOKEN}").json()[0]['timetableurl']
+SEARCH_CLASS = re.compile('.*?TGI12/1.*?', re.IGNORECASE)
+# SEARCH_CLASS = re.compile('.*?')
 
-# TODO: Dynamic URL; idk how
-URL = "https://app.dsbcontrol.de/data/c0bc0590-65dc-470e-bd27-d5cd5ad140bd/dedb7e2a-7747-4751-b390-f4d9d8ac71c9/dedb7e2a-7747-4751-b390-f4d9d8ac71c9.htm"
-# SEARCH_CLASS = re.compile('.*?TGI12/1.*?', re.IGNORECASE)
-SEARCH_CLASS = re.compile('.*?')
-
-#req = requests.get(URL)
-#page = BeautifulSoup(req.text, 'html.parser')
-page = BeautifulSoup(open('test.html', 'r').read(), 'html.parser')
+req = requests.get(URL)
+page = BeautifulSoup(req.text, 'html.parser')
+#page = BeautifulSoup(open('test.html', 'r').read(), 'html.parser')
 days = [d.parent for d in page.find_all('div', class_='mon_title')]
 days_dict = {}
 
